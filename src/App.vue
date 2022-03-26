@@ -1,7 +1,8 @@
 <template>
-  <div id="app">
+  <div>
     <my-header />
-    <my-footer />
+    <router-view></router-view>
+    <my-footer v-show="this.$route.meta.show" />
   </div>
 </template>
 
@@ -13,6 +14,10 @@ export default {
   components: {
     MyHeader,
     MyFooter,
+  },
+  mounted() {
+    this.$store.dispatch("home/categoryList");
+    
   },
 };
 </script>

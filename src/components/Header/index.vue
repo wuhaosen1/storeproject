@@ -7,8 +7,8 @@
           <p>尚品汇欢迎您！</p>
           <p>
             <span>请</span>
-            <a href="###">登录</a>
-            <a href="###" class="register">免费注册</a>
+            <router-link to="/login">登录</router-link>
+            <router-link to="/register" class="register">免费注册</router-link>
           </p>
         </div>
         <div class="typeList">
@@ -26,9 +26,9 @@
     <!--头部第二行 搜索区域-->
     <div class="bottom">
       <h1 class="logoArea">
-        <a class="logo" title="尚品汇" href="###" target="_blank">
+        <router-link class="logo" title="尚品汇" to="/home" target="_blank">
           <img src="./images/logo.png" alt="" />
-        </a>
+        </router-link>
       </h1>
       <div class="searchArea">
         <form action="###" class="searchForm">
@@ -36,8 +36,13 @@
             type="text"
             id="autocomplete"
             class="input-error input-xxlarge"
+            v-model="keyword"
           />
-          <button class="sui-btn btn-xlarge btn-danger" type="button">
+          <button
+            class="sui-btn btn-xlarge btn-danger"
+            type="button"
+            @click="search"
+          >
             搜索
           </button>
         </form>
@@ -51,8 +56,28 @@ export default {
   name: "MyHeader",
   data() {
     return {
-      n: 1,
+      keyword: "",
     };
+  },
+  methods: {
+    search() {
+      //传params参数和query参数
+      //1传统写法
+      // this.$router.push(
+      //   "/search/" + this.keyword + "?k=" + this.keyword.toUpperCase()
+      // );
+      //2模板字符串写法
+      // this.$router.push(
+      //   `/search/${this.keyword}?k=${this.keyword.toUpperCase()}`
+      // );
+      //3对象写法用的最多需要给路由加name,不可以通过path进行跳转！！！，如果已经占位了就必须传不然会导致路径错乱，可以传undefined占位
+      //4路由组件可以传递props
+      this.$router.push({
+        name: "search",
+        params: { keyword: this.keyword },
+        query: { k: this.keyword.toUpperCase() },
+      });
+    },
   },
 };
 </script>

@@ -26,7 +26,7 @@
     <!--头部第二行 搜索区域-->
     <div class="bottom">
       <h1 class="logoArea">
-        <router-link class="logo" title="尚品汇" to="/home" target="_blank">
+        <router-link class="logo" title="尚品汇" to="/home" target="">
           <img src="./images/logo.png" alt="" />
         </router-link>
       </h1>
@@ -42,6 +42,7 @@
             class="sui-btn btn-xlarge btn-danger"
             type="button"
             @click="search"
+            @keyup.enter="search"
           >
             搜索
           </button>
@@ -61,6 +62,7 @@ export default {
   },
   methods: {
     search() {
+      // this.$store.dispatch("search/reqSearchInfo", this.params);
       //传params参数和query参数
       //1传统写法
       // this.$router.push(
@@ -72,12 +74,42 @@ export default {
       // );
       //3对象写法用的最多需要给路由加name,不可以通过path进行跳转！！！，如果已经占位了就必须传不然会导致路径错乱，可以传undefined占位
       //4路由组件可以传递props
-      this.$router.push({
-        name: "search",
-        params: { keyword: this.keyword },
-        query: { k: this.keyword.toUpperCase() },
-      });
+      // if (this.keyword) {
+      //   this.$router.push({
+      //     name: "search",
+      //     params: { keyword: this.keyword },
+
+      //   });
+      // } else {
+      //   this.$router.push({
+      //     name: "search",
+      //     params: { keyword: undefined },
+
+      //   });
+      // }
+      // if (this.$route.query) {
+      //   let location = {
+      //     name: "search",
+      //     params: { keyword: this.keyword || undefined },
+      //   };
+      //   location.query = this.$route.query;
+      //   this.$router.push(location);
+      // }
+      if (this.$route.query) {
+        let location = {
+          name: "search",
+          params: { keyword: this.keyword || undefined },
+        };
+        location.query = this.$route.query;
+        this.$router.push(location);
+      }
     },
+  },
+  mounted() {
+    this.$bus.$on("clear", () => {
+      // console.log("clear");
+      this.keyword = "";
+    });
   },
 };
 </script>

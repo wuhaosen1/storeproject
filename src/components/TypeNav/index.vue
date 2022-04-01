@@ -1,7 +1,9 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <h2 class="all" @mouseenter="entershow" @mouseleave="leaveshow">
+        全部商品分类
+      </h2>
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -12,27 +14,56 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
-        <div class="all-sort-list2">
-          <div class="item bo" v-for="(c1,index) in categorylist" :key="c1.categoryId" :class="{cur:currentIndex == index}">
+      <div class="sort" v-show="show">
+        <!-- 利用事件委派进行路由跳转提高性能 以及编程式导航-->
+        <div
+          class="all-sort-list2"
+          @click="goSearch"
+          @mouseenter="entershow"
+          @mouseleave="leaveshow"
+        >
+          <div
+            class="item bo"
+            v-for="(c1, index) in categorylist"
+            :key="c1.categoryId"
+            :class="{ cur: currentIndex == index }"
+          >
             <h3 @mouseenter="changeindex(index)">
-              <a href="">{{c1.categoryName}}</a>
+              <a
+                :data-categoryName="c1.categoryName"
+                :data-categoryId1="c1.categoryId"
+                >{{ c1.categoryName }}</a
+              >
             </h3>
             <div class="item-list clearfix">
-              <div class="subitem" v-for="(c2,index) in c1.categoryChild" :key="c2.categoryId">
+              <div
+                class="subitem"
+                v-for="(c2, index) in c1.categoryChild"
+                :key="c2.categoryId"
+              >
                 <dl class="fore">
                   <dt>
-                    <a href="">{{c2.categoryName}}</a>
+                    <a
+                      :data-categoryName="c2.categoryName"
+                      :data-categoryId2="c2.categoryId"
+                      >{{ c2.categoryName }}</a
+                    >
                   </dt>
                   <dd>
-                    <em v-for="(c3,index) in c2.categoryChild" :key="c3.categoryId">
-                      <a href="">{{c3.categoryName}}</a>
+                    <em
+                      v-for="(c3, index) in c2.categoryChild"
+                      :key="c3.categoryId"
+                    >
+                      <a
+                        :data-categoryName="c3.categoryName"
+                        :data-categoryId3="c3.categoryId"
+                        >{{ c3.categoryName }}</a
+                      >
                     </em>
                   </dd>
                 </dl>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </div>
@@ -41,33 +72,64 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash";
 import { mapState } from "vuex";
 export default {
   name: "TypeNav",
   data() {
     return {
-      currentIndex:-1
+      currentIndex: -1,
+      // params: "",
+      show: true,
     };
   },
-  mounted() {
-  },
-  methods:{
+  methods: {
+    entershow() {
+      this.show = true;
+    },
+    leaveshow() {
+      this.currentIndex = -1;
+      if (this.$route.path != "/home") this.show = false;
+    },
     // changeindex(index){
     //   this.currentIndex =index
     // },
-    changeindex:
-      _.throttle(function(index){
-      this.currentIndex =index
-    },50)
+    changeindex: _.throttle(function (index) {
+      this.currentIndex = index;
+    }, 50),
+    goSearch(event) {
+      //要确定点击的是a标签，并且需要获取1.2.3级目录的信息，事件委派方式获取信息
+      this.$bus.$emit("clear");
+      let element = event.target;
+      let { categoryname, categoryid1, categoryid2, categoryid3 } =
+        element.dataset;
+      let location = { name: "search" };
+      let query = { categoryName: categoryname };
+      console.log(this.$route.params);
+      if (categoryname) {
+        if (categoryid1) {
+          query.category1Id = categoryid1;
+        } else if (categoryid2) {
+          query.category2Id = categoryid2;
+        } else {
+          query.category3Id = categoryid3;
+        }
+        if (this.$route.params) {
+          location.params = this.$route.params;
+          location.query = query;
+          this.$router.push(location);
+        }
+        // location.query = query;
+        // this.$router.push(location);
+      }
+    },
     // }
-
-      
-      
-    
   },
   computed: {
     ...mapState("home", ["categorylist"]),
+  },
+  mounted() {
+    if (this.$route.path !== "/home") this.show = false;
   },
 };
 </script>
@@ -187,11 +249,10 @@ export default {
               display: block;
             }
           }
-          
         }
         .cur {
-            background-color: skyblue;
-          }
+          background-color: skyblue;
+        }
       }
     }
   }
